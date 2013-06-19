@@ -28,11 +28,23 @@ config)
 	exit 0;;
 esac
 
-AWKSCRIPT=""
+AWKSCRIPT="BEGIN {"
+for STAT in ${TCPSTATUS}
+do
+	AWKSCRIPT="${AWKSCRIPT} arr[\"${STAT}\"]=1 ;"
+done
+AWKSCRIPT="${AWKSCRIPT} }"
+
 for STAT in ${TCPSTATUS}
 do
 	STAT_U=`echo ${STAT} | tr "a-z" "A-Z"`
-	AWKSCRIPT="${AWKSCRIPT}/${STAT_U}$/ {print \"${STAT}.value \" \$1} "
+	AWKSCRIPT="${AWKSCRIPT}/${STAT_U}$/ {print \"${STAT}.value \" \$1; arr[\"${STAT}\"] = 0 } "
 done
+AWKSCRIPT="${AWKSCRIPT} END {"
+for STAT in ${TCPSTATUS}
+do
+	AWKSCRIPT="${AWKSCRIPT} if (arr[\"${STAT}\"] == 0 ) { print \"${STAT}.value 0\" } ;"
+done
+AWKSCRIPT="${AWKSCRIPT} }"
 
 netstat -ant | grep :${TCPPORT} | awk '{print $6}' | sort| uniq -c | awk "${AWKSCRIPT}"
