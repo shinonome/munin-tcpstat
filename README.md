@@ -1,4 +1,4 @@
-munin-netstat
+munin-tcpstat
 =============
 
-Netstat count plugin fot munin
+TCP port status count plugin fot munin
