@@ -43,7 +43,7 @@ done
 AWKSCRIPT="${AWKSCRIPT} END {"
 for STAT in ${TCPSTATUS}
 do
-	AWKSCRIPT="${AWKSCRIPT} if (arr[\"${STAT}\"] == 0 ) { print \"${STAT}.value 0\" } ;"
+	AWKSCRIPT="${AWKSCRIPT} if (arr[\"${STAT}\"] == 1 ) { print \"${STAT}.value 0\" } ;"
 done
 AWKSCRIPT="${AWKSCRIPT} }"
 
