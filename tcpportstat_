@@ -1,0 +1,38 @@
+#!/bin/bash
+
+TCPPORT=`echo $0|cut -d "_" -f 2`
+
+if [ "${TCPPORT}" == "" ] ; then
+	exit 1
+fi
+
+TCPSTATUS="established syn_sent syn_recv fin_wait1 fin_wait2 time_wait close close_wait last_ack listen closing"
+
+case $1 in
+config)
+	echo "graph_title TCP:${TCPPORT} port status"
+	echo -n "graph_order"
+	for STAT in ${TCPSTATUS}
+	do
+		echo -n " ${STAT}"
+	done
+	echo ""
+	echo "graph_vlabel count"
+	echo "graph_args --base 1000 -l 0"
+	echo "graph_category Port Status"
+	for STAT in ${TCPSTATUS}
+	do
+		echo "${STAT}.draw LINE2"
+		echo "${STAT}.label ${STAT}"
+	done
+	exit 0;;
+esac
+
+AWKSCRIPT=""
+for STAT in ${TCPSTATUS}
+do
+	STAT_U=`echo ${STAT} | tr "a-z" "A-Z"`
+	AWKSCRIPT="${AWKSCRIPT}/${STAT_U}$/ {print \"${STAT}.value \" \$1} "
+done
+
+netstat -ant | grep :${TCPPORT} | awk '{print $6}' | sort| uniq -c | awk "${AWKSCRIPT}"
