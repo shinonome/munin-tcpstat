@@ -47,4 +47,8 @@ do
 done
 AWKSCRIPT="${AWKSCRIPT} }"
 
-netstat -ant | grep :${TCPPORT} | awk '{print $6}' | sort| uniq -c | awk "${AWKSCRIPT}"
+if [ "${TCPPORT}" == "all" ] ; then
+	netstat -ant | awk '{print $6}' | sort| uniq -c | awk "${AWKSCRIPT}"
+else
+	netstat -ant | grep ":${TCPPORT} " | awk '{print $6}' | sort| uniq -c | awk "${AWKSCRIPT}"
+fi
